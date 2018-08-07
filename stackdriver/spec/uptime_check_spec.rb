@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# bundle exec rspec
+
 # require_relative "../sign_url"
 require "rspec"
 
