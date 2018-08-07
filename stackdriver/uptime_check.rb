@@ -13,16 +13,47 @@
 # limitations under the License.
 
 # bundle exec ruby uptime_check.rb
-require "google/cloud/monitoring/v3"
 
+require 'pp'
+
+# [START monitoring_uptime_check_list_ips]
 def list_ips
-  uptime_check_service_client = Google::Cloud::Monitoring::V3::UptimeCheck.new
+  require "google/cloud/monitoring/v3"
+  client = Google::Cloud::Monitoring::V3::UptimeCheck.new
 
   # Iterate over all results.
-  uptime_check_service_client.list_uptime_check_ips.each do |element|
+  client.list_uptime_check_ips.each do |element|
     puts "#{element.location} #{element.ip_address}"
   end
 end
+# [END monitoring_uptime_check_list_ips]
+
+# [START monitoring_uptime_check_create]
+def create_uptime_check_config project_id: nil, host_name: nil, display_name: nil
+  require "google/cloud/monitoring/v3"
+
+  client = Google::Cloud::Monitoring::V3::UptimeCheck.new
+  project_name = Google::Cloud::Monitoring::V3::UptimeCheckServiceClient.project_path(project_id)
+  labels = {host: host_name.nil? ? host_name : 'example.com'}
+  labels_hash = Hash[labels.map { |k, v| [String(k), String(v)]}]
+  config = {
+    display_name: display_name.nil? ? display_name : 'New uptime check',
+    monitored_resource: { 
+      type: 'uptime_url',
+      labels: labels_hash
+    },
+    # http_check: { path:  '/', port: 80 },
+    # timeout: { seconds: 10 },
+    # period: { seconds: 300 }
+  } 
+  pp(config)
+
+  client = Google::Cloud::Monitoring::V3::UptimeCheck.new
+  new_config = client.create_uptime_check_config(project_name, config)
+  pp(new_config)
+  return new_config
+end
+# [END monitoring_uptime_check_create]
 
 if __FILE__ == $PROGRAM_NAME
   command    = ARGV.shift
@@ -30,19 +61,19 @@ if __FILE__ == $PROGRAM_NAME
   case command
   when "list_ips"
     list_ips()
-  when "inspect_file"
-    inspect_file(
-      project_id: project_id,
-      filename: ARGV.shift.to_s,
-      max_findings: ARGV.shift.to_i
+  when "create_uptime_check"
+    create_uptime_check_config(
+      project_id: ARGV.shift.to_s,
+      host_name: ARGV.shift.to_s,
+      display_name: ARGV.shift.to_s
     )
   else
     puts <<-usage
 Usage: ruby uptime_check.rb <command> [arguments]
 
 Commands:
-  list_ips <content> <max_findings> Lists the ip address of uptime check servers.
-  inspect_file <filename> <max_findings> Inspect a local file.
+  list_ips  Lists the ip address of uptime check servers.
+  create_uptime_check  <project_id> <host_name> <display_name> Create a new uptime check
 
 Environment variables:
   GOOGLE_APPLICATION_CREDENTIALS set to the path to your JSON credentials
