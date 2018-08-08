@@ -35,15 +35,15 @@ def create_uptime_check_config project_id: nil, host_name: nil, display_name: ni
   client = Google::Cloud::Monitoring::V3::UptimeCheck.new
   project_name = Google::Cloud::Monitoring::V3::UptimeCheckServiceClient.project_path(project_id)
   config = {
-    display_name: display_name.nil? ? display_name : 'New uptime check',
+    display_name: display_name.nil? ? 'New uptime check' : display_name,
     monitored_resource: { 
       type: 'uptime_url',
-      labels: {'host' => host_name.nil? ? host_name : 'example.com'}
+      labels: {'host' => host_name.nil? ? 'example.com': host_name }
     },
     http_check: { path:  '/', port: 80 },
     timeout: { seconds: 10 },
     period: { seconds: 300 }
-  } 
+  }
   client = Google::Cloud::Monitoring::V3::UptimeCheck.new
   new_config = client.create_uptime_check_config(project_name, config)
   puts new_config.name

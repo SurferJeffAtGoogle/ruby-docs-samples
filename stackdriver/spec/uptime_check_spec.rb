@@ -23,7 +23,7 @@ describe "Stackdriver uptime check" do
     if @project_id.nil? then
       raise "Set the environment variable GOOGLE_CLOUD_PROJECT."
     end
-    @configs = [create_uptime_check_config(project_id:@project_id.to_s)]
+    @configs = [create_uptime_check_config(project_id:@project_id)]
   end
 
   after :all do
