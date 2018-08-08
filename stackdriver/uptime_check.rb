@@ -94,18 +94,18 @@ def update_uptime_check_config config_name: nil, new_display_name: nil, new_http
   puts "new_display_name: #{new_display_name}"
   puts "new_http_check_path: #{new_http_check_path}"
   config = { name: config_name }
-  pp config
-  field_mask = []
+  field_mask = Google::Protobuf::FieldMask.new
   if not new_display_name.nil? then
-    field_mask.push('display_name')
+    field_mask.paths.push('display_name')
     config[:display_name] = new_display_name
   end
   if not new_http_check_path.nil? then
-    field_mask.push('http_check.path')
+    field_mask.paths.push('http_check.path')
     config[:http_check] = {path: new_http_check_path }
   end
   pp config
-  client.update_uptime_check_config(config)
+  pp field_mask.to_hash
+  client.update_uptime_check_config( config, field_mask)
 end
 # [END monitoring_uptime_check_update]
 
@@ -129,9 +129,9 @@ if __FILE__ == $PROGRAM_NAME
     get_uptime_check_config(ARGV.shift.to_s)
   when "update_uptime_check"
     update_uptime_check_config(
-      ARGV.shift.to_s,
-      ARGV.shift.to_s,
-      ARGV.shift.to_s
+      config_name: ARGV.shift.to_s,
+      new_display_name: ARGV.shift.to_s,
+      new_http_check_path: ARGV.shift.to_s
     )
   else
     puts <<-usage
