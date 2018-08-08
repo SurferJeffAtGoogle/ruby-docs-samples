@@ -18,6 +18,18 @@ require_relative "../uptime_check"
 require "rspec"
 
 describe "Stackdriver uptime check" do
+  before :all do
+    @project_id = ENV["GOOGLE_CLOUD_PROJECT"]
+    if @project_id.nil? then
+      raise "Set the environment variable GOOGLE_CLOUD_PROJECT."
+    end
+    @configs = [create_uptime_check_config(project_id:@project_id.to_s)]
+  end
+
+  after :all do
+    @configs.each { |config| delete_uptime_check_config(config.name)}
+  end
+
   it "list_ips" do
     expect { list_ips() }.to output(/Singapore/).to_stdout
   end

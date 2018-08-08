@@ -45,11 +45,21 @@ def create_uptime_check_config project_id: nil, host_name: nil, display_name: ni
     period: { seconds: 300 }
   } 
   client = Google::Cloud::Monitoring::V3::UptimeCheck.new
-  new_config = client.create_uptime_check_config(project_name, config).to_hash
-  pp(new_config)
+  new_config = client.create_uptime_check_config(project_name, config)
+  puts new_config.name
   return new_config
 end
 # [END monitoring_uptime_check_create]
+
+# [START monitoring_uptime_check_delete]
+def delete_uptime_check_config(config_name)
+  require "google/cloud/monitoring/v3"
+
+  client = Google::Cloud::Monitoring::V3::UptimeCheck.new
+  client.delete_uptime_check_config(config_name)
+  puts "Deleted #{config_name}"
+end
+# [END monitoring_uptime_check_delete]
 
 if __FILE__ == $PROGRAM_NAME
   command    = ARGV.shift
@@ -63,6 +73,8 @@ if __FILE__ == $PROGRAM_NAME
       host_name: ARGV.shift.to_s,
       display_name: ARGV.shift.to_s
     )
+  when "delete_uptime_check"
+    delete_uptime_check_config(ARGV.shift.to_s)
   else
     puts <<-usage
 Usage: ruby uptime_check.rb <command> [arguments]
@@ -70,6 +82,7 @@ Usage: ruby uptime_check.rb <command> [arguments]
 Commands:
   list_ips  Lists the ip address of uptime check servers.
   create_uptime_check  <project_id> <host_name> <display_name> Create a new uptime check
+  delete_uptime_check  <name>  Deletes an uptime check.
 
 Environment variables:
   GOOGLE_APPLICATION_CREDENTIALS set to the path to your JSON credentials
