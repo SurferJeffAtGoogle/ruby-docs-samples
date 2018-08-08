@@ -74,6 +74,17 @@ def list_uptime_check_configs(project_id)
 end
 # [END monitoring_uptime_check_list_configs]
 
+# [START monitoring_uptime_check_get]
+def get_uptime_check_config(config_name)
+  require "google/cloud/monitoring/v3"
+
+  client = Google::Cloud::Monitoring::V3::UptimeCheck.new
+  config = client.get_uptime_check_config(config_name)
+  pp config.to_hash
+  return config
+end
+# [END monitoring_uptime_check_get]
+
 if __FILE__ == $PROGRAM_NAME
   command    = ARGV.shift
 
@@ -90,6 +101,8 @@ if __FILE__ == $PROGRAM_NAME
     delete_uptime_check_config(ARGV.shift.to_s)
   when "list_uptime_check"
     list_uptime_check_configs(ARGV.shift.to_s)
+  when "get_uptime_check"
+    get_uptime_check_config(ARGV.shift.to_s)
   else
     puts <<-usage
 Usage: ruby uptime_check.rb <command> [arguments]
@@ -98,6 +111,7 @@ Commands:
   list_ips  Lists the ip address of uptime check servers.
   create_uptime_check  <project_id> <host_name> <display_name> Create a new uptime check
   delete_uptime_check  <name>  Deletes an uptime check.
+  get_uptime_check  <name>  Gets the full details for an uptime check.
   list_uptime_check  <project_id>  Lists the uptime checks.
 
 Environment variables:
