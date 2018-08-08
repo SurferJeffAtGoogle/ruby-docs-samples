@@ -23,7 +23,8 @@ describe "Stackdriver uptime check" do
     if @project_id.nil? then
       raise "Set the environment variable GOOGLE_CLOUD_PROJECT."
     end
-    @configs = [create_uptime_check_config(project_id:@project_id)]
+    @configs = [create_uptime_check_config(project_id:@project_id),
+      create_uptime_check_config(project_id:@project_id)]
   end
 
   after :all do
@@ -33,4 +34,9 @@ describe "Stackdriver uptime check" do
   it "list_ips" do
     expect { list_ips() }.to output(/Singapore/).to_stdout
   end
+
+  it "list_uptime_checks" do
+    expect { list_uptime_check_configs(@project_id) }.to output(Regexp.new(@configs[0].name)).to_stdout
+  end
+
 end
