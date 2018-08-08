@@ -85,6 +85,30 @@ def get_uptime_check_config(config_name)
 end
 # [END monitoring_uptime_check_get]
 
+# [START monitoring_uptime_check_update]
+def update_uptime_check_config config_name: nil, new_display_name: nil, new_http_check_path: nil
+  require "google/cloud/monitoring/v3"
+
+  client = Google::Cloud::Monitoring::V3::UptimeCheck.new
+  puts "config_name: #{config_name}"
+  puts "new_display_name: #{new_display_name}"
+  puts "new_http_check_path: #{new_http_check_path}"
+  config = { name: config_name }
+  pp config
+  field_mask = []
+  if not new_display_name.nil? then
+    field_mask.push('display_name')
+    config[:display_name] = new_display_name
+  end
+  if not new_http_check_path.nil? then
+    field_mask.push('http_check.path')
+    config[:http_check] = {path: new_http_check_path }
+  end
+  pp config
+  client.update_uptime_check_config(config)
+end
+# [END monitoring_uptime_check_update]
+
 if __FILE__ == $PROGRAM_NAME
   command    = ARGV.shift
 
@@ -103,6 +127,12 @@ if __FILE__ == $PROGRAM_NAME
     list_uptime_check_configs(ARGV.shift.to_s)
   when "get_uptime_check"
     get_uptime_check_config(ARGV.shift.to_s)
+  when "update_uptime_check"
+    update_uptime_check_config(
+      ARGV.shift.to_s,
+      ARGV.shift.to_s,
+      ARGV.shift.to_s
+    )
   else
     puts <<-usage
 Usage: ruby uptime_check.rb <command> [arguments]
@@ -113,6 +143,7 @@ Commands:
   delete_uptime_check  <name>  Deletes an uptime check.
   get_uptime_check  <name>  Gets the full details for an uptime check.
   list_uptime_check  <project_id>  Lists the uptime checks.
+  update_uptime_check  <name> <new_display_name> <new_http_path>
 
 Environment variables:
   GOOGLE_APPLICATION_CREDENTIALS set to the path to your JSON credentials
