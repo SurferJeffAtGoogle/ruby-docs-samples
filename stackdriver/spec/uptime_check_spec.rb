@@ -39,4 +39,11 @@ describe "Stackdriver uptime check" do
     expect { list_uptime_check_configs(@project_id) }.to output(Regexp.new(@configs[0].name)).to_stdout
   end
 
+  it "update_uptime_checks" do
+    update_uptime_check_config(config_name: @configs[0].name, new_display_name: "Chicago")
+    expect { get_uptime_check_config(@configs[0].name) }.to output(/Chicago/).to_stdout
+    update_uptime_check_config(config_name: @configs[1].name, new_http_check_path: "https://example.appspot.com/")
+    expect { get_uptime_check_config(@configs[1].name) }.to output(/example.appspot.com/).to_stdout
+  end
+
 end
