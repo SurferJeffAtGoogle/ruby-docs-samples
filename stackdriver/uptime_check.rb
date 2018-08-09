@@ -94,9 +94,9 @@ def update_uptime_check_config config_name: nil, new_display_name: nil, new_http
   puts "new_display_name: #{new_display_name}"
   puts "new_http_check_path: #{new_http_check_path}"
   config = { name: config_name }
-  field_mask = Google::Protobuf::FieldMask.new
+  field_mask = { paths: []}
   if not new_display_name.nil? then
-    field_mask.paths.push('display_name')
+    field_mask[:paths].push('display_name')
     config[:display_name] = new_display_name
   end
   if false and not new_http_check_path.nil? then
