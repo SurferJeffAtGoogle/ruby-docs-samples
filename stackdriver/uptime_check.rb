@@ -90,9 +90,6 @@ def update_uptime_check_config config_name: nil, new_display_name: nil, new_http
   require "google/cloud/monitoring/v3"
 
   client = Google::Cloud::Monitoring::V3::UptimeCheck.new
-  puts "config_name: #{config_name}"
-  puts "new_display_name: #{new_display_name}"
-  puts "new_http_check_path: #{new_http_check_path}"
   config = { name: config_name }
   field_mask = { paths: []}
   if not new_display_name.to_s.empty? then
@@ -103,8 +100,6 @@ def update_uptime_check_config config_name: nil, new_display_name: nil, new_http
     field_mask[:paths].push('http_check.path')
     config[:http_check] = {path: new_http_check_path }
   end
-  pp config
-  pp field_mask.to_hash
   client.update_uptime_check_config(config, update_mask:field_mask)
 end
 # [END monitoring_uptime_check_update]
